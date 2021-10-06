@@ -1,0 +1,4 @@
+python-decouple
+requests
+schedule
+beautifulsoup4
