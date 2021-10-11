@@ -1,20 +1,11 @@
-# SCRAPE steamcommunity.com
+# Scrape data from immobilienscout24
 
-RESTful API connect to Elastic Search
+Crawl the latest item in https://www.immobilienscout24.de
 
 ## Features
 
-- Clean
-- Fast (>500 request/sec on a single core)
-- Manages request delays and maximum concurrency per domain
-- Automatic cookie and session handling
-- Sync/async/parallel scraping
-- Caching
-- Automatic encoding of non-unicode responses
-- Robots.txt support
-- Distributed scraping
-- Configuration via environment variables
-- Extensions
+- Search for the latest products on the website
+- Send notification to specified telegram
 
 ## Prerequisites
 
@@ -22,6 +13,7 @@ Before you continue, ensure you meet the following requirements:
 
 * You have installed the latest version of Python.
 * You are using a Windows, Linux or Mac OS machine.
+* You have installd Selenium IDE on Chrome/Firefox
 
 ## Installation
 
@@ -29,6 +21,12 @@ Add library with `requirements.txt` file:
 
 ```cmd
 pip install -r requirements.txt
+```
+
+Install Selenium IDE on Chrome/Firefox
+
+```cmd
+https://www.selenium.dev/selenium-ide/
 ```
 
 ## Usage
