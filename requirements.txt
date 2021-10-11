@@ -1,4 +1,8 @@
-python-decouple
+Flask-RESTful
+flask_cors
+Flask-APScheduler
 requests
-schedule
+python-decouple
+Flask-SQLAlchemy
 beautifulsoup4
+lxml

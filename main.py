@@ -1,49 +1,53 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import schedule
-import time
-import logging
 import requests
 from bs4 import BeautifulSoup
 
+from models.cookie import CookieModel
+from models.store import StoreModel
+from models.item import ItemModel
+
+from utils.headers import prepare_headers
 from utils.telegram.send_message import send_message_telegram, generate_message
+from utils.date_format import getTimeStamp
 
-log_format = '[%(levelname)s] - %(message)s'
-logging.basicConfig(level='INFO', format=log_format)
-
-
-def request_list_company(page):
-    company_url_list = []
-    logging.info("getting list of company in page " + str(page))
-    response = requests.get(page).text
-    soup = BeautifulSoup(response, 'html.parser')
-    list_of_company_div = soup.find_all("li", class_="result-list__listing ")
-    for company_div in list_of_company_div:
-        if company_div.find('a')['href']: company_url_list.append(company_div.find('a')['href'])
-    logging.info('Get total ' + str(len(company_url_list)) + ' company url')
-    return company_url_list
+BASE_URL = "https://www.immobilienscout24.de"
 
 
-def job():
-    page = "https://www.immobilienscout24.de/Suche/radius/wohnung-mieten?centerofsearchaddress=Berlin%3B%3B%3B1276003001%3BBerlin%3B&pricetype=rentpermonth&geocoordinates=52.51051%3B13.43068%3B20.0&sorting=2&enteredFrom=result_list#/"
+def update_latest_product():
     print("I'm working...")
-    # send_message_telegram(generate_message("I'm working..."))
 
-    company_url_list = request_list_company(page)
-    for company_url in company_url_list:
-        # get_company_details(company_url)
-        pass
+    cookie_item = CookieModel.find_by_id(1)
+    headers = prepare_headers(cookie_item.cookie)
 
-    logging.info('Get information of total ' + str(len([])) + ' companies')
+    stores = [store.json() for store in StoreModel.find_all()]
+    for store in stores:
+        print("I'm in stores loop...")
+
+        req = requests.get(store["url"], headers=headers)
+        soup = BeautifulSoup(req.text, "lxml")
+
+        # Absolute link of saved items
+        absolute_link_saved_items = [item.json()["absolute_link"] for item in ItemModel.find_all()]
+
+        items = soup.find_all("li", {"class": "result-list__listing"})
+        for item in items:
+            name = item.find('h5', {"class": "result-list-entry__brand-title"}).text
+            price = item.find('dd', {"class": "font-highlight font-tabular"}).text
+            absolute_link = get_absolution_link(item)
+            store_id = store["id"]
+            description = store["description"]
+
+            if absolute_link not in absolute_link_saved_items:
+                send_message_telegram(generate_message(name, price, absolute_link, description))
+
+            if ItemModel.find_by_absolute_link(absolute_link, store_id):
+                continue
+            item = ItemModel(name, price, absolute_link, store_id, getTimeStamp(), None, None, None)
+            item.save_to_db()
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    schedule.every(5).seconds.do(job)
-
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+def get_absolution_link(item):
+    link = item.find('a', {"class": "result-list-entry__brand-title-container"})
+    return f"{BASE_URL}{link['href']}"

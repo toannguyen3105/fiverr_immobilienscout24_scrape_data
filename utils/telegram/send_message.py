@@ -19,6 +19,13 @@ def send_message_telegram(message):
     requests.get(final_telegram_url)
 
 
-def generate_message(message):
-    return f"{get_random_emoji()} ---------- START ----------: \n {message} \n ---------- END ----------"
-
+def generate_message(name, price, link, description):
+    return f"{get_random_emoji()} " \
+           f"Immobilienscout24 24/7  \n" \
+           f"**********************  \n" \
+           f"**********************  \n" \
+           f"Query time: {get_date_telegram()}\n" \
+           f"Description: {description}\n" \
+           f"Item name: {name}\n" \
+           f"Item price: {price}\n" \
+           f"Item link: {link}\n"
