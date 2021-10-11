@@ -26,6 +26,6 @@ def generate_message(name, price, link, description):
            f"**********************  \n" \
            f"Query time: {get_date_telegram()}\n" \
            f"Description: {description}\n" \
-           f"Item name: {name}\n" \
+           f"Item apartment: {name}\n" \
            f"Item price: {price}\n" \
            f"Item link: {link}\n"
